@@ -1,10 +1,15 @@
-body { 
-    font-family: 'Comic Sans MS', cursive, sans-serif; 
+@import url('https://googleapis.com');
+
+body, select, input, button { 
+    font-family: 'Fredoka', 'Comic Sans MS', cursive, sans-serif; 
 }
 
-/* Prevent native number input arrows from breaking the clean design styling */
+/* Hide annoying web browsers spin buttons on inputs */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
 }
