@@ -4,4 +4,4 @@ A dynamic, mobile-friendly math practice game for students in Grades 1 through 5
 ## Features
 - Progress, scores, and streak tracking.
 - Modular code architecture (`app.js`) to adjust rules, constraints, or configurations seamlessly.
-- Built using HTML5, Tailwind CSS, and vanilla JS.
+- Built using HTML5
