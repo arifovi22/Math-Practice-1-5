@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Math Quest Academy</title>
     <style>
-        /* --- ALL KID-FRIENDLY STYLES --- */
+        /* --- ALL KID-FRIENDLY ARCADE STYLES --- */
         @import url('https://googleapis.com');
 
         * {
@@ -136,12 +136,17 @@
             padding: 25px 10px;
             margin-bottom: 20px;
             box-shadow: 0 6px 0 #bfdbfe;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         #questionText {
-            font-size: 3.2rem;
+            font-size: 1.8rem;
             font-weight: 900;
             color: #1e3a8a;
             margin: 0;
+            line-height: 1.3;
         }
 
         .input-container input {
@@ -266,7 +271,7 @@
                 <option value="1">🌈 Grade 1: Easy Add / Subtract</option>
                 <option value="2">⚡ Grade 2: Double Digits</option>
                 <option value="3">🌟 Grade 3: Multiplication</option>
-                <option value="4">🔮 Grade 4: Fun Division</option>
+                <option value="4" selected>🗽 Grade 4: NYC Syllabus Track</option>
                 <option value="5">💎 Grade 5: Expert Decimals</option>
             </select>
         </div>
@@ -289,7 +294,7 @@
         </div>
     </div>
 
-    <!-- The cache-buster link forces the browser to pull the new code fresh -->
-    <script src="app.js?v=2"></script>
+    <!-- Script cache-buster version forces full device refreshing -->
+    <script src="app.js?v=3"></script>
 </body>
 </html>
