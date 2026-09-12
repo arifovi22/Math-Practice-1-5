@@ -2,9 +2,7 @@ var score = 0;
 var streak = 0;
 var progress = 0;
 var currentAnswer = 0;
-var currentNum1 = 0;
-var currentNum2 = 0;
-var currentOp = '';
+var coachExplanationString = "";
 
 var gradeSelect = document.getElementById("gradeSelect");
 var questionText = document.getElementById("questionText");
@@ -90,66 +88,85 @@ function generateQuestion() {
     userAnswer.disabled = false;
 
     if (grade === "1") {
-        currentNum1 = Math.floor(Math.random() * 10) + 1;
-        currentNum2 = Math.floor(Math.random() * 10) + 1;
-        currentOp = Math.random() > 0.5 ? '+' : '-';
-        if (currentOp === '-' && currentNum1 < currentNum2) {
-            var temp1 = currentNum1;
-            currentNum1 = currentNum2;
-            currentNum2 = temp1;
-        }
-        currentAnswer = currentOp === '+' ? currentNum1 + currentNum2 : currentNum1 - currentNum2;
-        questionText.innerText = currentNum1 + " " + currentOp + " " + currentNum2 + " = ?";
+        var n1 = Math.floor(Math.random() * 10) + 1;
+        var n2 = Math.floor(Math.random() * 10) + 1;
+        var op = Math.random() > 0.5 ? '+' : '-';
+        if (op === '-' && n1 < n2) { var t = n1; n1 = n2; n2 = t; }
+        currentAnswer = op === '+' ? n1 + n2 : n1 - n2;
+        questionText.innerText = n1 + " " + op + " " + n2 + " = ?";
+        coachExplanationString = "Let's count! Start at " + n1 + " and adjust by " + n2 + " steps to find " + currentAnswer + ".";
 
     } else if (grade === "2") {
-        currentNum1 = Math.floor(Math.random() * 40) + 10;
-        currentNum2 = Math.floor(Math.random() * 40) + 10;
-        currentOp = Math.random() > 0.5 ? '+' : '-';
-        if (currentOp === '-' && currentNum1 < currentNum2) {
-            var temp2 = currentNum1;
-            currentNum1 = currentNum2;
-            currentNum2 = temp2;
-        }
-        currentAnswer = currentOp === '+' ? currentNum1 + currentNum2 : currentNum1 - currentNum2;
-        questionText.innerText = currentNum1 + " " + currentOp + " " + currentNum2 + " = ?";
+        var n1 = Math.floor(Math.random() * 40) + 10;
+        var n2 = Math.floor(Math.random() * 40) + 10;
+        var op = Math.random() > 0.5 ? '+' : '-';
+        if (op === '-' && n1 < n2) { var t = n1; n1 = n2; n2 = t; }
+        currentAnswer = op === '+' ? n1 + n2 : n1 - n2;
+        questionText.innerText = n1 + " " + op + " " + n2 + " = ?";
+        coachExplanationString = "Line up place values! Adding or subtracting columns gives you " + currentAnswer + ".";
 
     } else if (grade === "3") {
-        currentNum1 = Math.floor(Math.random() * 10) + 1;
-        currentNum2 = Math.floor(Math.random() * 10) + 1;
-        currentOp = '×';
-        currentAnswer = currentNum1 * currentNum2;
-        questionText.innerText = currentNum1 + " × " + currentNum2 + " = ?";
+        var n1 = Math.floor(Math.random() * 10) + 1;
+        var n2 = Math.floor(Math.random() * 10) + 1;
+        currentAnswer = n1 * n2;
+        questionText.innerText = n1 + " × " + n2 + " = ?";
+        coachExplanationString = "Multiplication forms arrays! Adding groups of " + n2 + " exactly " + n1 + " times results in " + currentAnswer + ".";
 
     } else if (grade === "4") {
-        currentNum2 = Math.floor(Math.random() * 8) + 2; 
-        currentAnswer = Math.floor(Math.random() * 9) + 1;
-        currentNum1 = currentNum2 * currentAnswer; 
-        currentOp = '÷';
-        questionText.innerText = currentNum1 + " ÷ " + currentNum2 + " = ?";
+        // --- AUTHENTIC NYC PUBLIC SCHOOL 4TH GRADE SYLLABUS CHALLENGES ---
+        var subType = Math.floor(Math.random() * 4);
+        
+        if (subType === 0) {
+            // Benchmark: NY-4.OA.1 Multiplicative Comparison
+            var multiplier = Math.floor(Math.random() * 6) + 4; // 4 to 9
+            var baseNum = Math.floor(Math.random() * 5) + 3; // 3 to 7
+            currentAnswer = multiplier * baseNum;
+            questionText.innerText = "A red ball costs $" + baseNum + ". A game costs " + multiplier + " times as much. How much does the game cost?";
+            coachExplanationString = "This is a <strong>multiplicative comparison</strong>! The problem tells us the object is " + multiplier + " times bigger than " + baseNum + ". Multiply " + baseNum + " × " + multiplier + " to get <strong>$" + currentAnswer + "</strong>.";
+            
+        } else if (subType === 1) {
+            // Benchmark: NY-4.NBT.4 Large Multi-Digit standard arithmetic subtraction
+            var big1 = Math.floor(Math.random() * 4000) + 5000; // 5000 - 9000
+            var big2 = Math.floor(Math.random() * 3000) + 1000; // 1000 - 4000
+            currentAnswer = big1 - big2;
+            questionText.innerText = "Solve using columns: " + big1 + " − " + big2;
+            coachExplanationString = "NYC standards require column precision. Subtract from right to left, borrowing fields where necessary: " + big1 + " − " + big2 + " = <strong>" + currentAnswer + "</strong>.";
+
+        } else if (subType === 2) {
+            // Benchmark: NY-4.OA.4 Factors & Multiples
+            var options = [12, 16, 20, 24, 36];
+            var chosenComposite = options[Math.floor(Math.random() * options.length)];
+            // Find a valid factor bundle matching target bounds
+            var factorsArr = [];
+            for (var f = 1; f <= chosenComposite; f++) {
+                if (chosenComposite % f === 0) factorsArr.push(f);
+            }
+            // Pull out a single target item
+            var finalFactor = factorsArr[Math.floor(Math.random() * (factorsArr.length - 1)) + 1];
+            currentAnswer = finalFactor;
+            questionText.innerText = "Which number is a factor pair option for " + chosenComposite + "? (Try counting numbers that divide it evenly)";
+            // For simplicity in automatic numerical text field validation, we accept any matching factor
+            questionText.innerText = "Find any factor of " + chosenComposite + " greater than 1:";
+            currentAnswer = finalFactor; // We will check if it divides cleanly in validation logic instead of hardcoding
+            coachExplanationString = "Factors divide a host composite number completely evenly with no remainders! Numbers like 2, 3, 4, or 6 multiply up neatly to reach " + chosenComposite + ".";
+
+        } else {
+            // Benchmark: NY-4.NBT.6 Division with Remainders
+            var divisor = Math.floor(Math.random() * 4) + 3; // 3 to 6
+            var quotient = Math.floor(Math.random() * 15) + 10; // 10 to 24
+            var dividend = (divisor * quotient) + 2; // guarantees remainder of 2
+            currentAnswer = quotient;
+            questionText.innerText = "What is the whole-number answer (quotient) for: " + dividend + " ÷ " + divisor + "? (Ignore the remainder left over)";
+            coachExplanationString = "Divide step by step! " + divisor + " goes into " + dividend + " exactly <strong>" + quotient + "</strong> times, leaving a small leftover remainder of 2.";
+        }
 
     } else if (grade === "5") {
-        currentNum1 = (Math.floor(Math.random() * 40) + 10) / 10;
-        currentNum2 = (Math.floor(Math.random() * 40) + 10) / 10;
-        currentOp = '+';
-        currentAnswer = parseFloat((currentNum1 + currentNum2).toFixed(1));
-        questionText.innerText = currentNum1 + " + " + currentNum2 + " = ?";
+        var n1 = (Math.floor(Math.random() * 40) + 10) / 10;
+        var n2 = (Math.floor(Math.random() * 40) + 10) / 10;
+        currentAnswer = parseFloat((n1 + n2).toFixed(1));
+        questionText.innerText = n1 + " + " + n2 + " = ?";
+        coachExplanationString = "Align the decimal points perfectly! Adding columns gives you " + currentAnswer + ".";
     }
-}
-
-function getCoachExplanation() {
-    if (currentOp === '+') {
-        if (gradeSelect.value === "5") {
-            return "Let's line up the decimals! Look at <strong>" + currentNum1 + "</strong> and <strong>" + currentNum2 + "</strong>. Add the numbers behind the decimal point first, then add the whole numbers together. That gives us exactly <strong>" + currentAnswer + "</strong>!";
-        }
-        return "Let's count up! Start with the bigger number <strong>" + currentNum1 + "</strong>, and count forward <strong>" + currentNum2 + "</strong> more numbers. You will land right on <strong>" + currentAnswer + "</strong>!";
-    } else if (currentOp === '-') {
-        return "Let's take away! Imagine you have <strong>" + currentNum1 + "</strong> stars and you lose <strong>" + currentNum2 + "</strong> of them. You are left with exactly <strong>" + currentAnswer + "</strong> stars!";
-    } else if (currentOp === '×') {
-        return "Multiplication means adding equal groups! <strong>" + currentNum1 + " × " + currentNum2 + "</strong> means counting the number <strong>" + currentNum2 + "</strong> a total of <strong>" + currentNum1 + "</strong> times. That equals <strong>" + currentAnswer + "</strong>!";
-    } else if (currentOp === '÷') {
-        return "Division means sharing equally! Imagine sharing <strong>" + currentNum1 + "</strong> candies fairly among <strong>" + currentNum2 + "</strong> friends. Each friend gets exactly <strong>" + currentAnswer + "</strong> candies!";
-    }
-    return "Take your time, let's try the next one together!";
 }
 
 function checkAnswer() {
@@ -158,8 +175,27 @@ function checkAnswer() {
 
     submitBtn.disabled = true;
     userAnswer.disabled = true;
+    
+    var isCorrect = false;
+    var parsedUser = parseFloat(userIn);
+    var grade = gradeSelect.value;
 
-    if (parseFloat(userIn) === currentAnswer) {
+    // Custom check rule override for Grade 4 factors challenge tracking
+    if (grade === "4" && questionText.innerText.indexOf("factor") !== -1) {
+        var matchNumbers = questionText.innerText.match(/\d+/);
+        if (matchNumbers) {
+            var targetComposite = parseInt(matchNumbers[0]);
+            if (parsedUser > 1 && targetComposite % parsedUser === 0) {
+                isCorrect = true;
+            }
+        }
+    } else {
+        if (parsedUser === currentAnswer) {
+            isCorrect = true;
+        }
+    }
+
+    if (isCorrect) {
         feedback.innerText = "🎉 Way to go! Correct! 🌟";
         feedback.className = "correct-text";
         score += 10;
@@ -177,27 +213,37 @@ function checkAnswer() {
         
         setTimeout(generateQuestion, 2000);
     } else {
-        feedback.innerText = "❌ Oops! The correct answer was " + currentAnswer;
+        // Grade 4 explicit check fallback values override safety mapping
+        var displayAns = currentAnswer;
+        if (grade === "4" && questionText.innerText.indexOf("factor") !== -1) {
+            var matchNums = questionText.innerText.match(/\d+/);
+            displayAns = "a valid number that divides it cleanly";
+        }
+
+        feedback.innerText = "❌ Oops! Let's check the rules.";
         feedback.className = "wrong-text";
         streak = 0;
-        
         progress = Math.max(progress - 10, 0);
         progressBar.style.width = progress + "%";
-
-        explanationText.innerHTML = getCoachExplanation();
+        explanationText.innerHTML = coachExplanationString;
         explanationBox.classList.remove("hidden");
     }
-
     scoreDisplay.innerText = score;
     streakDisplay.innerText = streak;
 }
-
-gradeSelect.addEventListener("change", generateQuestion);
-submitBtn.addEventListener("click", checkAnswer);
-understandBtn.addEventListener("click", generateQuestion); 
-
-userAnswer.addEventListener("keydown", function(e) {
-    if (e.key === "Enter" && !submitBtn.disabled) checkAnswer();
+// Attach events safely after complete load
+document.addEventListener("DOMContentLoaded", function() {
+    gradeSelect.addEventListener("change", generateQuestion);
+    submitBtn.addEventListener("click", checkAnswer);
+    understandBtn.addEventListener("click", generateQuestion);
+    userAnswer.addEventListener("keydown", 
+                                function(e) {
+                                    if (e.key === "Enter" && !submitBtn.disabled) checkAnswer();
+                                });
+    generateQuestion();
 });
-
-generateQuestion();
+// Fallback boot run just in case DOMContentLoaded already fired
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    generateQuestion();
+}
+        
