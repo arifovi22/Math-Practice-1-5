@@ -472,8 +472,9 @@ function checkAnswer() {
     if (currentQuestion.type === "mcq") {
         // ELA answers are buttons, so validate the selected option directly.
         if (selectedOption === null) {
-            feedback.innerText = "👆 Choose an answer first!";
+            feedback.textContent = "👆 Choose an answer first!";
             feedback.className = "wrong-text";
+            feedback.scrollIntoView({ behavior: "smooth", block: "center" });
             return;
         }
         isCorrect = selectedOption === currentAnswer;
@@ -489,7 +490,7 @@ function checkAnswer() {
     buttons.forEach(function(b) { b.disabled = true; });
 
     if (isCorrect) {
-        feedback.innerText = "🎉 Way to go! Correct! 🌟";
+        feedback.textContent = "🎉 Way to go! Correct! 🌟";
         feedback.className = "correct-text";
         score += 10;
         streak += 1;
@@ -497,30 +498,35 @@ function checkAnswer() {
         progressBar.style.width = progress + "%";
 
         if (progress >= 100) {
-            feedback.innerText = "🏆 AMAZING! LEVEL UP! 🚀";
+            feedback.textContent = "🏆 AMAZING! LEVEL UP! 🚀";
             spawnConfetti();
             progress = 0;
             setTimeout(function() { progressBar.style.width = "0%"; }, 1200);
         }
 
-        scoreDisplay.innerText = score;
-        streakDisplay.innerText = streak;
+        scoreDisplay.textContent = score;
+        streakDisplay.textContent = streak;
+        feedback.scrollIntoView({ behavior: "smooth", block: "center" });
         setTimeout(generateQuestion, 1500);
     } else {
-        feedback.innerText = "❌ Not quite. Let's use the Math Coach.";
+        feedback.textContent = "❌ Not quite. Let's use the Math Coach.";
         feedback.className = "wrong-text";
         streak = 0;
         progress = Math.max(progress - 10, 0);
         progressBar.style.width = progress + "%";
         explanationText.innerHTML = coachExplanationString;
         explanationBox.classList.remove("hidden");
-        scoreDisplay.innerText = score;
-        streakDisplay.innerText = streak;
+        scoreDisplay.textContent = score;
+        streakDisplay.textContent = streak;
 
         // Show the correct ELA option after an incorrect attempt.
         buttons.forEach(function(b) {
             if (b.dataset.answer === currentAnswer) b.classList.add("correct-option");
         });
+
+        // The coach box can land below the fold on the taller ELA layout,
+        // so scroll it into view rather than leaving it looking unresponsive.
+        explanationBox.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 }
 
