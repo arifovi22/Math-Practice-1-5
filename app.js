@@ -36,6 +36,7 @@ resizeCanvas();
 
 function spawnConfetti() {
     if (!ctx) return;
+    particles = [];
     for (var i = 0; i < 120; i++) {
         particles.push({
             x: Math.random() * canvas.width,
@@ -51,8 +52,8 @@ function spawnConfetti() {
     animateConfetti();
 }
 
-var animationFrameId;
 function animateConfetti() {
+    if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     var active = false;
 
@@ -74,7 +75,7 @@ function animateConfetti() {
     }
 
     if (active) {
-        animationFrameId = requestAnimationFrame(animateConfetti);
+        requestAnimationFrame(animateConfetti);
     } else {
         particles = [];
     }
@@ -105,7 +106,6 @@ function generateQuestion() {
     }
 }
 
-// --- MATH QUESTION GENERATOR ---
 function generateMathQuestion(grade) {
     if (grade === "1") {
         var n1 = Math.floor(Math.random() * 10) + 1;
@@ -114,7 +114,7 @@ function generateMathQuestion(grade) {
         if (op === '-' && n1 < n2) { var t = n1; n1 = n2; n2 = t; }
         currentAnswer = (op === '+' ? n1 + n2 : n1 - n2).toString();
         questionText.innerText = n1 + " " + op + " " + n2 + " = ?";
-        coachExplanationString = "Count starting at " + n1 + " and move " + n2 + " steps to get " + currentAnswer + ".";
+        coachExplanationString = "Count starting at " + n1 + " and adjust by " + n2 + " steps to get " + currentAnswer + ".";
 
     } else if (grade === "2") {
         var n1 = Math.floor(Math.random() * 40) + 10;
@@ -133,44 +133,38 @@ function generateMathQuestion(grade) {
         coachExplanationString = "Adding groups of " + n2 + " exactly " + n1 + " times gives " + currentAnswer + ".";
 
     } else if (grade === "4") {
-        // --- COMPLETE NYC 4TH GRADE MATH SYLLABUS TRACK (8 SUBTYPES) ---
         var subType = Math.floor(Math.random() * 8);
 
         if (subType === 0) {
-            // NY-4.OA.1 Multiplicative Comparison
             var multiplier = Math.floor(Math.random() * 6) + 4;
             var baseNum = Math.floor(Math.random() * 5) + 3;
             currentAnswer = (multiplier * baseNum).toString();
-            questionText.innerText = "A metro card ride costs $" + baseNum + ". A pass costs " + multiplier + " times as much. How much is the pass?";
+            questionText.innerText = "A metro card ride costs $" + baseNum + ". A monthly pass costs " + multiplier + " times as much. How much does the pass cost?";
             coachExplanationString = "Multiplicative comparison! Multiply $" + baseNum + " × " + multiplier + " = **$" + currentAnswer + "**.";
 
         } else if (subType === 1) {
-            // NY-4.NBT.4 Standard Subtraction
             var big1 = Math.floor(Math.random() * 4000) + 5000;
             var big2 = Math.floor(Math.random() * 3000) + 1000;
             currentAnswer = (big1 - big2).toString();
-            questionText.innerText = "Subtract using standard algorithm: " + big1 + " − " + big2;
-            coachExplanationString = "Subtract from right to left with regrouping: " + big1 + " − " + big2 + " = **" + currentAnswer + "**.";
+            questionText.innerText = "Subtract using columns: " + big1 + " − " + big2;
+            coachExplanationString = "Subtract from right to left with borrowing: " + big1 + " − " + big2 + " = **" + currentAnswer + "**.";
 
         } else if (subType === 2) {
-            // NY-4.OA.4 Factors & Multiples
             var options = [12, 16, 20, 24, 36];
             var chosenComposite = options[Math.floor(Math.random() * options.length)];
             questionText.innerText = "Find any factor of " + chosenComposite + " greater than 1:";
             currentAnswer = "FACTOR_CHECK_" + chosenComposite;
-            coachExplanationString = "Factors divide a composite number evenly! Numbers like 2, 3, 4, or 6 multiply into " + chosenComposite + ".";
+            coachExplanationString = "Factors divide a number evenly with no remainder! Factors for " + chosenComposite + " include numbers like 2, 3, 4, or 6.";
 
         } else if (subType === 3) {
-            // NY-4.NBT.6 Division with Quotient Focus
             var divisor = Math.floor(Math.random() * 4) + 3;
             var quotient = Math.floor(Math.random() * 15) + 10;
             var dividend = (divisor * quotient) + 2;
             currentAnswer = quotient.toString();
             questionText.innerText = "What is the whole-number quotient for: " + dividend + " ÷ " + divisor + "? (Ignore remainder)";
-            coachExplanationString = divisor + " goes into " + dividend + " exactly **" + quotient + "** times (with a remainder of 2).";
+            coachExplanationString = divisor + " goes into " + dividend + " exactly **" + quotient + "** times (leaving a remainder of 2).";
 
         } else if (subType === 4) {
-            // NY-4.NF.1 / NY-4.NF.2 Equivalent Fractions (Multiple Choice)
             var numer = Math.floor(Math.random() * 3) + 1;
             var denom = numer + Math.floor(Math.random() * 3) + 1;
             var scale = Math.floor(Math.random() * 3) + 2;
@@ -182,37 +176,34 @@ function generateMathQuestion(grade) {
 
             questionText.innerText = "Which fraction is equivalent to " + numer + "/" + denom + "?";
             setupMultipleChoice(correctFrac, [correctFrac, wrong1, wrong2, wrong3]);
-            coachExplanationString = "Multiply both numerator and denominator by " + scale + ": (" + numer + "×" + scale + ")/(" + denom + "×" + scale + ") = **" + correctFrac + "**.";
+            coachExplanationString = "Multiply both top and bottom by " + scale + ": (" + numer + "×" + scale + ")/(" + denom + "×" + scale + ") = **" + correctFrac + "**.";
 
         } else if (subType === 5) {
-            // NY-4.NF.7 Decimal Comparisons
             var d1 = (Math.floor(Math.random() * 80) + 10) / 100;
             var d2 = (Math.floor(Math.random() * 80) + 10) / 100;
             while (d1 === d2) { d2 = (Math.floor(Math.random() * 80) + 10) / 100; }
             
             var sym = d1 > d2 ? ">" : "<";
             currentAnswer = sym;
-            questionText.innerText = "Which symbol makes this true? " + d1.toFixed(2) + "  [ ? ]  " + d2.toFixed(2) + "  (Type > or <)";
+            questionText.innerText = "Which symbol makes this true? " + d1.toFixed(2) + "  [ ? ]  " + d2.toFixed(2) + "\n(Type > or <)";
             coachExplanationString = "Compare tenths first, then hundredths! " + d1.toFixed(2) + " is " + (d1 > d2 ? "greater than" : "less than") + " " + d2.toFixed(2) + ".";
 
         } else if (subType === 6) {
-            // NY-4.MD.3 Area & Perimeter of Rectangles
             var length = Math.floor(Math.random() * 6) + 4;
             var width = Math.floor(Math.random() * 4) + 2;
             var askArea = Math.random() > 0.5;
 
             if (askArea) {
                 currentAnswer = (length * width).toString();
-                questionText.innerText = "A park in Central Park is " + length + " meters long and " + width + " meters wide. What is its AREA in sq meters?";
+                questionText.innerText = "A playground in Brooklyn is " + length + " meters long and " + width + " meters wide. What is its AREA in sq meters?";
                 coachExplanationString = "Area = length × width: " + length + " × " + width + " = **" + currentAnswer + " sq meters**.";
             } else {
                 currentAnswer = (2 * (length + width)).toString();
-                questionText.innerText = "A playground is " + length + " ft long and " + width + " ft wide. What is its PERIMETER in feet?";
+                questionText.innerText = "A garden is " + length + " ft long and " + width + " ft wide. What is its PERIMETER in feet?";
                 coachExplanationString = "Perimeter = 2 × (length + width): 2 × (" + length + " + " + width + ") = **" + currentAnswer + " ft**.";
             }
 
         } else {
-            // NY-4.G.1 Geometry - Angle Classification (Multiple Choice)
             var angleTypes = [
                 { type: "Acute", desc: "less than 90 degrees (e.g. 45°)" },
                 { type: "Right", desc: "exactly 90 degrees" },
@@ -230,17 +221,15 @@ function generateMathQuestion(grade) {
         var n2 = (Math.floor(Math.random() * 40) + 10) / 10;
         currentAnswer = (parseFloat((n1 + n2).toFixed(1))).toString();
         questionText.innerText = n1 + " + " + n2 + " = ?";
-        coachExplanationString = "Align the decimal points perfectly! Sum = " + currentAnswer + ".";
+        coachExplanationString = "Align the decimal points! Sum = " + currentAnswer + ".";
     }
 }
 
-// --- ELA QUESTION GENERATOR ---
 function generateELAQuestion(grade) {
     if (grade === "4") {
         var subType = Math.floor(Math.random() * 4);
 
         if (subType === 0) {
-            // NY-4L.5 Figurative Language (Simile vs Metaphor)
             var items = [
                 { text: "The subway train was as fast as a bullet.", type: "Simile", exp: "Uses 'as' to compare train and bullet." },
                 { text: "The classroom was a zoo during recess.", type: "Metaphor", exp: "Directly states classroom WAS a zoo without using 'like' or 'as'." },
@@ -253,31 +242,28 @@ function generateELAQuestion(grade) {
             coachExplanationString = "**" + target.type + "**: " + target.exp;
 
         } else if (subType === 1) {
-            // NY-4L.2e Compound Sentence Conjunctions
             var items = [
                 { q: "I wanted to ride my bike in Prospect Park, ___ it started to rain.", ans: "but", opts: ["but", "so", "or", "for"] },
                 { q: "We can visit the museum, ___ we can go to the zoo.", ans: "or", opts: ["or", "because", "nor", "so"] },
-                { q: "Maya studied hard for her NYC math test, ___ she scored 100%.", ans: "so", opts: ["so", "but", "or", "yet"] }
+                { q: "Maya studied hard for her NYC test, ___ she scored 100%.", ans: "so", opts: ["so", "but", "or", "yet"] }
             ];
             var target = items[Math.floor(Math.random() * items.length)];
-            questionText.innerText = "Choose the best coordinating conjunction to complete the sentence:\n\"" + target.q + "\"";
+            questionText.innerText = "Choose the best conjunction to complete the sentence:\n\"" + target.q + "\"";
             setupMultipleChoice(target.ans, target.opts);
-            coachExplanationString = "Coordinating conjunctions (FANBOYS) join complete thoughts. **'" + target.ans + "'** fits the context perfectly.";
+            coachExplanationString = "Coordinating conjunctions join thoughts. **'" + target.ans + "'** fits the sentence meaning.";
 
         } else if (subType === 2) {
-            // NY-4L.4 Context Clues Vocabulary
             var vocab = [
                 { word: "gigantic", sentence: "The Empire State Building is a gigantic skyscraper that looms over the city.", answer: "Very large", choices: ["Very large", "Tiny", "Hidden", "Old"] },
-                { word: "cautious", sentence: "Leo was cautious when crossing the busy NYC street, looking both ways twice.", answer: "Careful", choices: ["Careful", "Fast", "Noisy", "Afraid"] },
-                { word: "persist", sentence: "Even when the math problem was tough, Sarah decided to persist until she found the answer.", answer: "Keep trying", choices: ["Keep trying", "Give up", "Sleep", "Forget"] }
+                { word: "cautious", sentence: "Leo was cautious when crossing the busy street, looking both ways twice.", answer: "Careful", choices: ["Careful", "Fast", "Noisy", "Afraid"] },
+                { word: "persist", sentence: "Even when the problem was tough, Sarah decided to persist until she found the answer.", answer: "Keep trying", choices: ["Keep trying", "Give up", "Sleep", "Forget"] }
             ];
             var target = vocab[Math.floor(Math.random() * vocab.length)];
             questionText.innerText = "What does '" + target.word + "' mean in this context?\n\"" + target.sentence + "\"";
             setupMultipleChoice(target.answer, target.choices);
-            coachExplanationString = "Clues in the sentence show that **" + target.word + "** means '**" + target.answer + "**'.";
+            coachExplanationString = "Context clues show that **" + target.word + "** means '**" + target.answer + "**'.";
 
         } else {
-            // NY-4L.2d Dialogue Punctuation Rules
             var target = {
                 q: "Which sentence uses correct dialogue punctuation?",
                 correct: "\"We are taking the subway to Queens,\" said Mom.",
@@ -289,25 +275,22 @@ function generateELAQuestion(grade) {
             };
             questionText.innerText = target.q;
             setupMultipleChoice(target.correct, [target.correct, ...target.wrongs]);
-            coachExplanationString = "Dialogue requires quotation marks around exact words and a comma inside the closing quotes before the speech tag.";
+            coachExplanationString = "Dialogue needs quotation marks around spoken words and a comma inside the closing quotes before the speech tag.";
         }
     } else {
-        // Fallback generic ELA for other grades
         questionText.innerText = "Identify the noun in: 'The yellow taxi drove fast.'";
         setupMultipleChoice("taxi", ["drove", "taxi", "yellow", "fast"]);
-        coachExplanationString = "'Taxi' is a person, place, or thing (noun).";
+        coachExplanationString = "'Taxi' is a thing (noun).";
     }
 }
 
-// Helper for UI switching to Multiple Choice
 function setupMultipleChoice(correctAnswerVal, choicesArray) {
     isMultipleChoice = true;
     currentAnswer = correctAnswerVal;
     inputContainer.classList.add("hidden");
     choicesContainer.classList.remove("hidden");
     
-    // Shuffle choices
-    var shuffled = choicesArray.sort(function() { return 0.5 - Math.random(); });
+    var shuffled = choicesArray.slice().sort(function() { return 0.5 - Math.random(); });
     
     shuffled.forEach(function(choice) {
         var btn = document.createElement("button");
@@ -322,12 +305,11 @@ function setupMultipleChoice(correctAnswerVal, choicesArray) {
 
 function checkAnswer(selectedChoice) {
     var userIn = isMultipleChoice ? selectedChoice : userAnswer.value.trim();
-    if (userIn === "") return;
+    if (!userIn) return;
 
     submitBtn.disabled = true;
     userAnswer.disabled = true;
 
-    // Disable MC buttons
     var choiceBtns = choicesContainer.querySelectorAll("button");
     choiceBtns.forEach(function(btn) { btn.disabled = true; });
 
