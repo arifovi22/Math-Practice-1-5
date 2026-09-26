@@ -8,6 +8,7 @@ var streak = 0;
 var progress = 0;
 var currentAnswer = null;
 var currentQuestion = null;
+var selectedOption = null;
 var coachExplanationString = "";
 
 var subjectSelect = document.getElementById("subjectSelect");
@@ -99,6 +100,7 @@ function shuffle(arr) {
 }
 
 function setQuestionUI(type) {
+    selectedOption = null;
     feedback.innerText = "";
     feedback.className = "";
     explanationBox.classList.add("hidden");
@@ -143,7 +145,7 @@ function makeELAQuestion(question, options, answer, explanation, standard) {
             var buttons = optionsBox.querySelectorAll(".answer-option");
             buttons.forEach(function(b) { b.classList.remove("selected"); });
             btn.classList.add("selected");
-            userAnswer.value = option;
+            selectedOption = option;
         });
         optionsBox.appendChild(btn);
     });
@@ -468,8 +470,13 @@ function checkAnswer() {
     var raw = userAnswer.value.trim();
 
     if (currentQuestion.type === "mcq") {
-        if (raw === "") return;
-        isCorrect = raw === currentAnswer;
+        // ELA answers are buttons, so validate the selected option directly.
+        if (selectedOption === null) {
+            feedback.innerText = "👆 Choose an answer first!";
+            feedback.className = "wrong-text";
+            return;
+        }
+        isCorrect = selectedOption === currentAnswer;
     } else {
         if (raw === "") return;
         var parsedUser = parseFloat(raw);
